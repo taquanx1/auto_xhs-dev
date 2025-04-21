@@ -4,7 +4,7 @@
 # Configuration Variables
 # ----------------------------
 PROJECT_NAME="XhsCat"             # Deployment directory
-SERVER_IP="104.248.159.130"
+SERVER_IP="167.172.91.13"
 DOMAIN="xhscat.com"
 
 # Update and install necessary packages
@@ -27,24 +27,23 @@ sudo pip install certbot
 sudo pip install --upgrade yarl
 
 # Set up Supervisor configuration for $PROJECT_NAME
-sudo bash -c 'cat << EOF > /etc/supervisor/conf.d/$PROJECT_NAME.conf
-[program:$PROJECT_NAME]
-directory=/root/$PROJECT_NAME
-command=gunicorn -w 6 --timeout 120 -b 0.0.0.0:8000 run_prod:app
+sudo bash -c 'cat << EOF > /etc/supervisor/conf.d/XhsCat.conf
+[program:XhsCat]
+directory=/root/auto_xhs-dev
+command=/root/auto_xhs-dev/venv/bin/gunicorn -w 4 --timeout 1200 -b 0.0.0.0:8000 run_prod:app
 autostart=true
 autorestart=true
-stderr_logfile=/var/log/$PROJECT_NAME.err.log
-stdout_logfile=/var/log/$PROJECT_NAME.out.log
-environment=PATH="/root/$PROJECT_NAME/venv/bin",PYTHONPATH="/root/$PROJECT_NAME"
+stderr_logfile=/var/log/XhsCat.err.log
+stdout_logfile=/var/log/XhsCat.out.log
+environment=PATH="/root/auto_xhs-dev/venv/bin",PYTHONPATH="/root/auto_xhs-dev"
 EOF'
 
 # Reload Supervisor to apply the new configuration
 sudo supervisorctl reread
 sudo supervisorctl update
-sudo supervisorctl start $PROJECT_NAME
+sudo supervisorctl start XhsCat
 
 echo "$PROJECT_NAME setup complete and running under Supervisor."
-
 
 
 #!/bin/bash
