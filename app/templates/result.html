@@ -1,81 +1,164 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>生成结果 - 小红书笔记生成</title>
-  <!-- 与首页保持相同的字体和主题色 -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap"
-    rel="stylesheet"
-  >
   <style>
+    /* reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+    }
+
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Roboto', sans-serif;
-      background: #fafafa;
-      color: #333;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background: #000;            /* Notes dark bg */
+      color: #EEE;                 /* light text */
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      overflow: hidden;
     }
+
+    /* fixed header */
     header {
-      padding: 16px;
-      background: #fff;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 40px;
+      background: #000;         /* note color tint */
       display: flex;
       align-items: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      padding: 0 16px;
+      color: #FFD60A;
+      z-index: 10;
+      padding-top: 35px;
     }
-    header img { width:24px; height:24px; }
-    header span {
+    header img {
+      width: 30px;
+      height: 30px;
+    }
+    header .title[contenteditable] {
       margin-left: 8px;
-      font-size: 18px;
-      font-weight: 500;
+      font-size: 17px;
+      outline: none;
+      cursor: text;
     }
+    header .actions {
+      margin-left: auto;
+      display: flex;
+      gap: 16px;
+    }
+    header .actions img {
+      width: 30px;
+      height: 30px;
+    }
+
+    /* scrollable content */
     main {
       flex: 1;
+      margin-top: 44px;           /* below header */
+      margin-bottom: 44px;        /* above footer */
       padding: 16px;
+      overflow-y: auto;
     }
+
     textarea {
       width: 100%;
-      min-height: 300px;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      height: calc(100% - 60px);
+      background: transparent;
+      border: none;
+      color: #EEE;
       font-size: 16px;
-      background: #fff;
-      resize: vertical;
+      line-height: 1.6;
+      resize: none;
     }
+
     .btn-copy {
-      margin-top: 16px;
+      margin-top: 12px;
       width: 100%;
-      padding: 16px;
-      font-size: 18px;
-      color: #fff;
-      background: linear-gradient(90deg, #ff5f6d, #ffc371);
+      padding: 12px;
+      font-size: 16px;
+      color: #000;
+      background: #FFD60A;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      position: relative;
-      overflow: hidden;
     }
     .btn-copy:active {
-      opacity: 0.8;
+      opacity: 0.7;
     }
+
+    a.home-link {
+      display: block;
+      margin-top: 12px;
+      text-align: center;
+      color: #0A84FF;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    /* fixed footer */
+    footer {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      background: #000;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 10;
+    }
+    .tool-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: #FFD60A;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+    .tool-btn.active {
+      opacity: 1;
+    }
+
+    .result_textarea {
+        height: auto;
+        height: 75vh; /* ensures it never grows past the viewport */
+        width: 100%;
+        background: transparent;
+        border: none;
+        color: #EEE;
+        font-size: 16px;
+        line-height: 1.6;
+        resize: none;
+    }
+
   </style>
 </head>
 <body>
   <header>
-    <img src="../static/logo.avif" alt="Logo">
-    <span>小红书笔记生成</span>
+    <img src="../static/element/app_back.png" alt="Back" onclick="window.location.href='/'"  />
+    <span class="title" contenteditable="true">清迈攻略</span>
+    <div class="actions">
+      <img src="../static/element/app_share.png" alt="Share" />
+      <img src="../static/element/app_more.png" alt="More" />
+    </div>
   </header>
+
   <main>
-    <textarea id="resultArea" readonly>{{ content }}</textarea>
+    <textarea class="result_textarea" id="resultArea" contenteditable="true">{{ content }}</textarea>
     <button class="btn-copy" id="copyBtn">复制全部 ✂️</button>
-    <a href="/" style="display: block; margin-top: 16px; text-align: center; color: #007BFF;">返回首页</a>
+    <a href="/" class="home-link">返回首页</a>
   </main>
+
+  <!--
+  <footer>
+    <button class="tool-btn active" id="listBtn">•</button>
+    <button class="tool-btn" id="circleBtn1">◦</button>
+    <button class="tool-btn" id="circleBtn2">◦</button>
+  </footer>
+  -->
 
   <script>
     document.getElementById('copyBtn').addEventListener('click', async () => {
