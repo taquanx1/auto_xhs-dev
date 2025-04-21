@@ -5,7 +5,7 @@
 # ----------------------------
 PROJECT_NAME="XhsCat"             # Deployment directory
 SERVER_IP="104.248.159.130"
-DOMAIN="cloudunion.zone"
+DOMAIN="xhscat.com"
 
 # Update and install necessary packages
 sudo apt-get update
@@ -53,55 +53,57 @@ echo "$PROJECT_NAME setup complete and running under Supervisor."
 sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bak
 
 # Write the redirect configuration for HTTP to HTTPS
-sudo tee /etc/nginx/sites-available/default > /dev/null <<EOL
+sudo tee /etc/nginx/sites-available/default > /dev/null <<'EOL'
 server {
     listen 80;
-    server_name http://$SERVER_IP;
+    server_name 104.248.159.130 xhscat.com;
 
     # Redirect all HTTP requests to HTTPS
-    return 301 https://\$host\$request_uri;
+    return 301 https://$host$request_uri;
 }
+
 server {
     listen 443 ssl;
-    server_name http://$SERVER_IP;
-    ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem; # managed by Certbot
+    server_name 104.248.159.130 xhscat.com;
+
+    ssl_certificate     /etc/letsencrypt/live/xhscat.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/xhscat.com/privkey.pem;
     client_max_body_size 100M;
 
     location / {
-        proxy_pass https://127.0.0.1:8000; # or your application port
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        # If your app is plain HTTP locally, use http://127.0.0.1:8000
+        proxy_pass http://127.0.0.1:8000;
+
+        # now these $… stay intact for Nginx
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
 
-        # Add timeout settings
         proxy_connect_timeout 60s;
-        proxy_read_timeout 60s;
-        proxy_send_timeout 60s;
+        proxy_read_timeout    60s;
+        proxy_send_timeout    60s;
 
-        # Add CORS headers
-        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Origin'  '*';
         add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
         add_header 'Access-Control-Allow-Headers' 'Origin, Content-Type, Accept, Authorization';
         add_header 'Access-Control-Expose-Headers' 'Content-Length' always;
 
-        # Handle prefligh requests
         if ($request_method = 'OPTIONS') {
-            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow-Origin'  '*';
             add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
             add_header 'Access-Control-Allow-Headers' 'Origin, Content-Type, Accept, Authorization';
             add_header 'Access-Control-Max-Age' 3600;
             return 204;
         }
-
-     }
-
+    }
 }
 EOL
 
 # Test the nginx configuration for syntax errors
 sudo nginx -t
+
+sudo certbot certonly --standalone -d "$DOMAIN" -d www."$DOMAIN"
 
 # If no errors, reload nginx
 if [ $? -eq 0 ]; then
