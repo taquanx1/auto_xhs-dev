@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>生成结果 - 小红书笔记生成</title>
+  <!-- 与首页保持相同的字体和主题色 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap"
+    rel="stylesheet"
+  >
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto', sans-serif;
+      background: #fafafa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      padding: 16px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    header img { width:24px; height:24px; }
+    header span {
+      margin-left: 8px;
+      font-size: 18px;
+      font-weight: 500;
+    }
+    main {
+      flex: 1;
+      padding: 16px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 300px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      background: #fff;
+      resize: vertical;
+    }
+    .btn-copy {
+      margin-top: 16px;
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      color: #fff;
+      background: linear-gradient(90deg, #ff5f6d, #ffc371);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-copy:active {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="../static/logo.avif" alt="Logo">
+    <span>小红书笔记生成</span>
+  </header>
+  <main>
+    <textarea id="resultArea" readonly>{{ content }}</textarea>
+    <button class="btn-copy" id="copyBtn">复制全部 ✂️</button>
+    <a href="/" style="display: block; margin-top: 16px; text-align: center; color: #007BFF;">返回首页</a>
+  </main>
+
+  <script>
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const area = document.getElementById('resultArea');
+      area.select();
+      try {
+        await navigator.clipboard.writeText(area.value);
+        alert('内容已复制到剪贴板');
+      } catch (err) {
+        alert('复制失败，请手动复制');
+      }
+    });
+  </script>
+</body>
+</html>

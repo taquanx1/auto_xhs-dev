@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <!-- 基本 Meta -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>小红书笔记一键生成</title>
+  <meta name="description" content="通过小红书笔记生成 App，快速生成简洁、口语化、带有 emoji 的旅游攻略笔记。">
+  <meta name="keywords" content="小红书, 笔记, 旅游攻略, 生成, App">
+  <link rel="canonical" href="https://yourdomain.com/app">
+  <meta name="robots" content="index,follow">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:title" content="小红书笔记生成 - 一键生成旅游攻略笔记">
+  <meta property="og:description" content="快速生成简洁、口语化、带有 emoji 的小红书旅游攻略笔记。">
+  <meta property="og:image" content="https://yourdomain.com/images/og-image.png">
+  <meta property="og:url" content="https://yourdomain.com/app">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="小红书笔记生成 - 一键生成旅游攻略笔记">
+  <meta name="twitter:description" content="快速生成简洁、口语化、带有 emoji 的小红书旅游攻略笔记。">
+  <meta name="twitter:image" content="https://yourdomain.com/images/twitter-image.png">
+
+  <!-- 字体预连接 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- 内联关键信息样式（Critical CSS）-->
+  <style>
+    /* Reset + 移动优先基础样式 */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; font-family: 'Roboto', sans-serif; background: #fafafa; color: #333; }
+    img { display: block; max-width: 100%; height: auto; }
+    button, input, select, textarea { font-family: inherit; }
+
+    /* Header */
+    header { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #fff; }
+    .logo-title { display: flex; align-items: center; }
+    .logo-title img { width: 24px; height: 24px; }
+    .logo-title span { margin-left: 8px; font-size: 18px; font-weight: 500; }
+    .login-btn { padding: 6px 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+
+    /* 主体 */
+    main { padding: 16px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 16px; }
+    .form-group input[type="text"],
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      background: #fff;
+    }
+    .form-group textarea { min-height: 80px; resize: none; }
+
+    .checkbox-group { display: flex; flex-direction: column; }
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+    .checkbox-group input {
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+    }
+
+    /* 生成按钮 */
+    .btn-generate {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      color: #fff;
+      background: linear-gradient(90deg, #ff5f6d, #ffc371);
+      border: none;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .btn-generate::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.5), transparent 70%);
+      animation: glow 2s infinite;
+    }
+    @keyframes glow {
+      0%, 100% { opacity: 0; }
+      50%      { opacity: 1; }
+    }
+  </style>
+
+  <!-- 非关键样式异步加载 -->
+  <link rel="stylesheet" href="/css/main.min.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="/css/main.min.css"></noscript>
+</head>
+
+<body>
+  <header>
+    <div class="logo-title">
+      <img src="../static/logo.avif" alt="小红书笔记生成 Logo">
+      <span>小红书笔记生成</span>
+    </div>
+    <button class="login-btn">登录</button>
+  </header>
+
+  <main>
+    <form action="/generate" method="POST">
+      <!-- 地点 -->
+      <div class="form-group">
+        <label for="subject">地点</label>
+        <input type="text" id="location" name="location" placeholder="厦门美食探店" required>
+      </div>
+
+      <!-- 主题 -->
+      <div class="form-group">
+        <label for="subject">主题</label>
+        <input type="text" id="subject" name="subject" placeholder="美食探店" required>
+      </div>
+
+      <!-- 个数 -->
+      <div class="form-group">
+        <label for="count">个数</label>
+        <select id="count" name="count">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+        </select>
+      </div>
+
+      <!-- 对象属性 -->
+      <div class="form-group">
+        <label for="attributes">介绍对象属性</label>
+        <textarea id="attributes" name="attributes" placeholder="推荐指数 简单介绍 价格 营业时间"></textarea>
+      </div>
+
+      <!-- 选项复选框 -->
+      <div class="form-group checkbox-group">
+        <label><input type="checkbox" name="options" value="simple" checked>简洁</label>
+        <label><input type="checkbox" name="options" value="colloquial" checked>口语化</label>
+        <label><input type="checkbox" name="options" value="emoji" checked>带有 emoji</label>
+      </div>
+
+      <!-- 个数 -->
+      <div class="form-group">
+        <label for="model">模型</label>
+        <select id="model" name="model">
+          <option value="sonar">sonar</option>
+          <option value="sonar-pro">sonar-pro</option>
+          <option value="sonar-reasoning" selected>sonar-reasoning</option>
+          <option value="sonar-reasoning-pro">sonar-reasoning-pro</option>
+        </select>
+      </div>
+
+      <!-- 生成按钮 -->
+      <button type="submit" class="btn-generate">生成</button>
+    </form>
+  </main>
+
+  <!-- 延迟加载 JS -->
+  <script src="/js/app.min.js" defer></script>
+</body>
+</html>

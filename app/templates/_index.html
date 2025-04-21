@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DreamCat - Transform your photos</title>
+  <style>
+    /* Global Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    body {
+      background: #00A8B5; /* Teal background */
+      color: #FFFFFF;      /* White text */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-container img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .logo-container h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    /* Login Button */
+    .login-btn {
+      background-color: #FF5F8A;
+      color: #FFF;
+      padding: 0.6rem 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: opacity 0.3s;
+    }
+
+    .login-btn:hover {
+      opacity: 0.8;
+    }
+
+    /* Main container */
+    .main-content {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 1rem;
+    }
+
+    .main-content h2 {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      font-size: 1.4rem;
+      font-weight: 500;
+    }
+
+    .preview-image {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    /* Upload and Convert Buttons Container */
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      #background-color: #2B2442;
+      gap: 1rem;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 2rem;
+    }
+
+    /* Upload Button (using label for hidden input) */
+    #file-input {
+      display: none; /* Hidden file input */
+    }
+
+    .upload-btn {
+      background-color: #FFFFFF;
+      color: #00A8B5;
+      text-align: center;
+      padding: 0.8rem 1.2rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      width: 100%;
+      max-width: 600px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .upload-btn:hover {
+      background-color: #F0F0F0;
+      color: #009298;
+    }
+
+    /* Convert Button with Shining Effect */
+    .convert-btn {
+      position: relative;
+      background-color: #FF5F8A;
+      color: #FFF;
+      text-align: center;
+      padding: 0.8rem 1.2rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      overflow: hidden;
+      /* For the shining effect */
+      width: 100%;
+    max-width: 600px;
+      animation: glow 2s infinite;
+    }
+
+    @keyframes glow {
+      0% {
+        box-shadow: 0 0 5px #FFF;
+      }
+      50% {
+        box-shadow: 0 0 20px #FFF;
+      }
+      100% {
+        box-shadow: 0 0 5px #FFF;
+      }
+    }
+
+    .convert-btn:hover {
+      opacity: 0.8;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+      .logo-container h1 {
+        font-size: 1.2rem;
+      }
+
+      .main-content h2 {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header with Logo and Login -->
+  <header>
+    <div class="logo-container">
+      <img src="../static/ima/cat_icon.png" alt="Cat Icon" />
+      <h1>DreamCat</h1>
+    </div>
+    <button class="login-btn">Login</button>
+  </header>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h2>Transform your photos in an instant</h2>
+    <!-- Placeholder image; replace with your own or remove if you don’t want a preview -->
+    <img src="../static/ima/hero.png" alt="Sample" class="preview-image"/>
+
+
+    <div class="button-group">
+      <form method="POST" enctype="multipart/form-data">
+        <!-- Hidden file input used both for preview and form upload -->
+        <label for="file-input" class="upload-btn">Upload an image</label>
+        <input type="file" id="file" name="file" accept="image/*" />
+
+        <button type="submit" id="convert-btn" class="convert-btn">Convert</button>
+      </form>
+      {% if output_image %}
+        <a id="download-btn" class="download-btn" href="{{ url_for('static', filename='products/' + output_image) }}" download="converted_image.png">
+          Download Converted Image
+        </a>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Trigger file dialog when "Upload an image" is clicked
+    // (Already done by the label for="file-input", but you can add logic here if needed)
+    const fileInput = document.getElementById('file-input');
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files && fileInput.files[0]) {
+        // For example, show a preview
+        const preview = document.querySelector('.preview-image');
+        preview.src = URL.createObjectURL(fileInput.files[0]);
+      }
+    });
+
+    // "Convert" button logic
+    const convertBtn = document.getElementById('convert-btn');
+    convertBtn.addEventListener('click', () => {
+      // Implement your conversion logic here
+      alert('Converting photo...');
+    });
+  </script>
+
+  <!-- JavaScript -->
+  <script>
+    const fileInput = document.getElementById('file-input');
+    const heroImage = document.getElementById('hero-image');
+    const convertBtn = document.getElementById('convert-btn');
+    const downloadBtn = document.getElementById('download-btn');
+
+    // File input change event: Validate and show preview
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (file) {
+        // Validate file type using MIME types
+        const allowedTypes = ['image/jpeg', 'image/png'];
+        if (!allowedTypes.includes(file.type)) {
+          alert('Please upload an image in .jpg, .jpeg, or .png format.');
+          fileInput.value = '';
+          return;
+        }
+        // Replace hero photo with the uploaded image
+        heroImage.src = URL.createObjectURL(file);
+        // Hide download button if it was previously shown
+        downloadBtn.style.display = 'none';
+      }
+    });
+
+    // Convert button click event
+    convertBtn.addEventListener('click', () => {
+      // Ensure an image is uploaded (checking if the hero image is not the placeholder)
+      if (!heroImage.src || heroImage.src.indexOf('placeholder.jpg') !== -1) {
+        alert('Please upload an image first.');
+        return;
+      }
+
+      // Create a new image element to ensure it's loaded (using crossOrigin to avoid potential CORS issues)
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = heroImage.src;
+
+      img.onload = () => {
+        // Create a canvas element for the conversion
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+
+        // Example conversion: Apply a grayscale filter
+        ctx.filter = 'grayscale(100%)';
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // Get the converted image as a data URL
+        const convertedDataURL = canvas.toDataURL('image/png');
+
+        // Replace the hero photo with the converted image
+        heroImage.src = convertedDataURL;
+
+        // Set up the download button with the converted image data
+        downloadBtn.href = convertedDataURL;
+        downloadBtn.style.display = 'block';
+      };
+
+      img.onerror = () => {
+        alert('There was an error loading the image. Please try again.');
+      };
+    });
+  </script>
+
+</body>
+</html>
