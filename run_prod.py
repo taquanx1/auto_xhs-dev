@@ -1,5 +1,6 @@
 from app import create_app, api
 from flask import Flask, request, render_template
+import json
 
 app = create_app()
 
@@ -45,6 +46,26 @@ def generate():
 
     # 生成笔记内容
     content = generate_notes(seed_dic, model)
+    #content = content.replace("**", "")
+    #content = content.split('###')[1:]
+    #head_list = [ c.split('\n')[0].replace('  ', '+').replace(' ', '+') for c in content ]
+    #content = '-------------\n'.join(content)
+
+    out_content = ''
+    head_list = []
+    content_json = json.loads(content)
+    out_content += f"## {content_json['main_title']}\n\n"
+    for i in range(1, int(count) + 1):
+        cur_title_key = f'item_title_{i}'
+        cur_content_key = f'item_content_{i}'
+        if cur_title_key in content_json and cur_content_key in content_json:
+            head_list.append(content_json[cur_title_key])
+
+            cur_title = content_json[cur_title_key]
+            cur_item_content = content_json[cur_content_key]
+            out_content += f"{str(i+1)}. {cur_title}\n"
+            out_content += f"{cur_item_content}\n\n"
+    content = out_content.replace('**', '').replace('##', '')
 
     _content = '''
 ## 清迈躺平慢生活·轻奢风格美食探店（5家必吃小吃店推荐攻略）
@@ -172,7 +193,7 @@ def generate():
     '''
 
     # 渲染到可编辑页面
-    return render_template("result.html", content=content)
+    return render_template("result.html", content=content, head_list=head_list)
 
 if __name__ == '__main__':
     app.run(debug=True)
