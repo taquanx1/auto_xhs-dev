@@ -149,6 +149,19 @@
   <main>
     <textarea class="result_textarea" id="resultArea" contenteditable="true">{{ content }}</textarea>
     <button class="btn-copy" id="copyBtn">复制全部 ✂️</button>
+
+    <div class="head_list">
+      {% for head in head_list %}
+        <button
+        type="button"
+        onclick="window.open(
+          'https://www.bing.com/images/search?q={{ head }}&qft=%2Bfilterui%2Bfilterui%3Aaspect-tall',
+        )"
+      >
+        {{ head }}📷
+      </button>
+      {% endfor %}
+
     <a href="/" class="home-link">返回首页</a>
   </main>
 
